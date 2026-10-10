@@ -1,8 +1,0 @@
-/Users/aymen/Desktop/real/trail/backend/src/test/java/com/turtledot/studio/MySQLDatabaseIntegrationTest.java
-/Users/aymen/Desktop/real/trail/backend/src/test/java/com/turtledot/studio/StudioApplicationTests.java
-/Users/aymen/Desktop/real/trail/backend/src/test/java/com/turtledot/studio/auth/AuthControllerTest.java
-/Users/aymen/Desktop/real/trail/backend/src/test/java/com/turtledot/studio/client/ClientAndEmployeeIntegrationTest.java
-/Users/aymen/Desktop/real/trail/backend/src/test/java/com/turtledot/studio/media/MediaUploadAndAlbumIntegrationTest.java
-/Users/aymen/Desktop/real/trail/backend/src/test/java/com/turtledot/studio/payment/GstPaymentInvoiceIntegrationTest.java
-/Users/aymen/Desktop/real/trail/backend/src/test/java/com/turtledot/studio/payment/PaymentAndStorageSyncIntegrationTest.java
-/Users/aymen/Desktop/real/trail/backend/src/test/java/com/turtledot/studio/payment/TieredPaymentGatingIntegrationTest.java
