@@ -1,0 +1,8 @@
+com/turtledot/studio/media/MediaUploadAndAlbumIntegrationTest.class
+com/turtledot/studio/payment/TieredPaymentGatingIntegrationTest.class
+com/turtledot/studio/payment/PaymentAndStorageSyncIntegrationTest.class
+com/turtledot/studio/MySQLDatabaseIntegrationTest.class
+com/turtledot/studio/auth/AuthControllerTest.class
+com/turtledot/studio/client/ClientAndEmployeeIntegrationTest.class
+com/turtledot/studio/payment/GstPaymentInvoiceIntegrationTest.class
+com/turtledot/studio/StudioApplicationTests.class
