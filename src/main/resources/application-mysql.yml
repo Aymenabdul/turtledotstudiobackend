@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${DB_URL:${DATABASE_URL:${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/studio_crm?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}}}
-    username: ${DB_USERNAME:${DATABASE_USERNAME:${SPRING_DATASOURCE_USERNAME:root}}}
-    password: ${DB_PASSWORD:${DATABASE_PASSWORD:${SPRING_DATASOURCE_PASSWORD:Parkour@123}}}
+    url: ${DB_URL:${DATABASE_URL:${SPRING_DATASOURCE_URL:jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/studio_crm?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC}}}
+    username: ${DB_USERNAME:${DATABASE_USERNAME:${SPRING_DATASOURCE_USERNAME:HaVAW6A4cEHQgAV.root}}}
+    password: ${DB_PASSWORD:${DATABASE_PASSWORD:${SPRING_DATASOURCE_PASSWORD:Txqz4ZxOhNcsASl9}}}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect

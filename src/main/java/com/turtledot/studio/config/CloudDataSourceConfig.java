@@ -125,11 +125,11 @@ public class CloudDataSourceConfig {
             log.info("[DataSource] Constructed from HOST/PORT -> Host: {}:{}, Database: {}, Username: {}",
                     host, portNum, dbName, username);
         } else {
-            // Default local fallback
-            jdbcUrl = "jdbc:mysql://localhost:3306/studio_crm?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            if (username == null) username = "root";
-            if (password == null) password = "Parkour@123";
-            log.warn("[DataSource] WARNING: No cloud database credentials found in environment variables! Falling back to localhost:3306");
+            // Default cloud database fallback (TiDB Cloud)
+            jdbcUrl = "jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/studio_crm?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+            if (username == null) username = "HaVAW6A4cEHQgAV.root";
+            if (password == null) password = "Txqz4ZxOhNcsASl9";
+            log.info("[DataSource] Using configured TiDB Cloud database: {}", maskUrl(jdbcUrl));
         }
 
         HikariConfig config = new HikariConfig();
