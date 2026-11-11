@@ -50,6 +50,21 @@ public class CloudDataSourceConfig {
         String port = getFirstNonBlank(env, "DB_PORT", "MYSQLPORT", "MYSQL_PORT");
         String database = getFirstNonBlank(env, "DB_NAME", "MYSQLDATABASE", "MYSQL_DATABASE");
 
+        // Guard against any leftover stale Aiven cloud environment variables in Render
+        if (rawUrl != null && rawUrl.contains("aivencloud.com")) {
+            log.warn("[DataSource] Stale Aiven Cloud database URL detected in environment ({})! Ignoring it.", maskUrl(rawUrl));
+            rawUrl = null;
+        }
+        if (host != null && host.contains("aivencloud.com")) {
+            log.warn("[DataSource] Stale Aiven Cloud host detected in environment ({})! Ignoring it.", host);
+            host = null;
+        }
+        if (username != null && username.equalsIgnoreCase("avnadmin")) {
+            log.warn("[DataSource] Stale Aiven username (avnadmin) detected! Ignoring it.");
+            username = null;
+            password = null;
+        }
+
         String jdbcUrl;
 
         if (rawUrl != null && !rawUrl.isBlank()) {
@@ -59,10 +74,14 @@ public class CloudDataSourceConfig {
                 try {
                     URI uri = URI.create(rawUrl);
                     String uriHost = uri.getHost();
-                    int uriPort = uri.getPort() > 0 ? uri.getPort() : 3306;
+                    int defaultPort = (uriHost != null && uriHost.contains("tidbcloud.com")) ? 4000 : 3306;
+                    int uriPort = uri.getPort() > 0 ? uri.getPort() : defaultPort;
                     String uriPath = uri.getPath();
                     if (uriPath != null && uriPath.startsWith("/")) {
                         uriPath = uriPath.substring(1);
+                    }
+                    if (uriPath == null || uriPath.isBlank() || "sys".equalsIgnoreCase(uriPath)) {
+                        uriPath = "studio_crm";
                     }
                     if (uri.getUserInfo() != null) {
                         String[] userInfo = uri.getUserInfo().split(":", 2);
@@ -75,8 +94,8 @@ public class CloudDataSourceConfig {
                     }
 
                     jdbcUrl = String.format(
-                            "jdbc:mysql://%s:%d/%s?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC",
-                            uriHost, uriPort, uriPath != null ? uriPath : ""
+                            "jdbc:mysql://%s:%d/%s?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true",
+                            uriHost, uriPort, uriPath
                     );
                     log.info("[DataSource] Successfully parsed mysql:// URI -> Host: {}:{}, Database: {}, Username: {}",
                             uriHost, uriPort, uriPath, username);
@@ -111,25 +130,29 @@ public class CloudDataSourceConfig {
                 if (!jdbcUrl.contains("serverTimezone")) {
                     jdbcUrl += "&serverTimezone=UTC";
                 }
+                if (!jdbcUrl.contains("createDatabaseIfNotExist")) {
+                    jdbcUrl += "&createDatabaseIfNotExist=true";
+                }
                 log.info("[DataSource] Using configured JDBC URL: {}", maskUrl(jdbcUrl));
             } else {
                 jdbcUrl = rawUrl.startsWith("jdbc:") ? rawUrl : "jdbc:mysql://" + rawUrl;
             }
         } else if (host != null && !host.isBlank()) {
-            int portNum = (port != null && !port.isBlank()) ? Integer.parseInt(port) : 3306;
-            String dbName = (database != null && !database.isBlank()) ? database : "studio_crm";
+            int defaultPort = host.contains("tidbcloud.com") ? 4000 : 3306;
+            int portNum = (port != null && !port.isBlank()) ? Integer.parseInt(port) : defaultPort;
+            String dbName = (database != null && !database.isBlank() && !"sys".equalsIgnoreCase(database)) ? database : "studio_crm";
             jdbcUrl = String.format(
-                    "jdbc:mysql://%s:%d/%s?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC",
+                    "jdbc:mysql://%s:%d/%s?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true",
                     host, portNum, dbName
             );
             log.info("[DataSource] Constructed from HOST/PORT -> Host: {}:{}, Database: {}, Username: {}",
                     host, portNum, dbName, username);
         } else {
             // Default cloud database fallback (TiDB Cloud)
-            jdbcUrl = "jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/studio_crm?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            if (username == null) username = "HaVAW6A4cEHQgAV.root";
-            if (password == null) password = "Txqz4ZxOhNcsASl9";
-            log.info("[DataSource] Using configured TiDB Cloud database: {}", maskUrl(jdbcUrl));
+            jdbcUrl = "jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/studio_crm?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true";
+            if (username == null || username.isBlank()) username = "HaVAW6A4cEHQgAV.root";
+            if (password == null || password.isBlank()) password = "Txqz4ZxOhNcsASl9";
+            log.info("[DataSource] Using configured TiDB Cloud database fallback: {}", maskUrl(jdbcUrl));
         }
 
         HikariConfig config = new HikariConfig();
